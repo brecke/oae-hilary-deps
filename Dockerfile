@@ -82,11 +82,8 @@ ENV NPM_CONFIG_LOGLEVEL info
 ENV NODE_VERSION 0.10.17
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-  && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-  && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
-  && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt | sha256sum -c - \
-  && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
-  && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc SHASUMS256.txt \
+  && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local \
+  && rm "node-v$NODE_VERSION-linux-x64.tar.gz" \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
 ENV YARN_VERSION 0.21.3
