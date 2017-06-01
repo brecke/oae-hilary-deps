@@ -81,10 +81,12 @@ RUN set -ex \
 ENV NPM_CONFIG_LOGLEVEL info
 ENV NODE_VERSION 0.10.17
 
-RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-  && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local \
-  && rm "node-v$NODE_VERSION-linux-x64.tar.gz" \
-  && ln -s /usr/local/bin/node /usr/local/bin/nodejs
+RUN curl -SLO https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz \
+  && tar xzf node-v$NODE_VERSION-linux-x64.tar.gz -C /usr/local \
+  && rm node-v$NODE_VERSION-linux-x64.tar.gz \
+  && ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/node /usr/local/bin/node \
+  && ln -s /usr/local/node-v$NODE_VERSION-linux-x64/bin/npm /usr/local/bin/npm \
+  && which node && node -v && which npm && npm -v
 
 ENV YARN_VERSION 0.21.3
 
