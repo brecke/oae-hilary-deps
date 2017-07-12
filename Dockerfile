@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		file \
 		g++ \
 		gcc \
+    ghostscript \
     git \
 		graphicsmagick \
 		libbz2-dev \
