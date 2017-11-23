@@ -65,6 +65,4 @@ RUN adduser -h ${SERVICE_HOME} -s /sbin/nologin -u 1001 -D ${SERVICE_USER} && \
 	openjdk8 \
 	libreoffice \
 	libreoffice-base \
-	libreoffice-lang-de \
-	mesa-gl \
 	ttf-freefont
