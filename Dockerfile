@@ -13,6 +13,15 @@
 # permissions and limitations under the License.
 #
 
+#
+# Setup in two steps
+#
+# Step 1: Build the image
+# $ docker build -f Dockerfile -t oae-hilary-deps:latest .
+# Step 2: Run the docker
+# $ docker run -it --name=hilary-deps --net=host oae-hilary-deps:latest
+#
+
 FROM node:6.12.0-alpine
 LABEL Name=OAE-hilary-dependencies
 LABEL Author=ApereoFoundation 
