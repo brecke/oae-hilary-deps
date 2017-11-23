@@ -46,7 +46,6 @@ RUN apk add --no-cache \
   poppler \
   poppler-utils \
   && rm -rf /var/lib/apt/lists/*
-
   # pdf2htmlex \
   # python-poppler \ 
 
