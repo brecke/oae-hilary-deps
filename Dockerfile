@@ -31,7 +31,7 @@ LABEL Email=oae@apereo.org
 # Install pdf2htmlex based on
 # https://hub.docker.com/r/bwits/pdf2htmlex-alpine/
 #
-RUN apk --update add alpine-sdk xz poppler-dev pango-dev m4 libtool perl autoconf automake coreutils python-dev zlib-dev freetype-dev glib-dev cmake libxml2 libxml2-dev libxml2-utils && \
+RUN apk --update add git alpine-sdk xz poppler-dev pango-dev m4 libtool perl autoconf automake coreutils python-dev zlib-dev freetype-dev glib-dev cmake libxml2 libxml2-dev libxml2-utils && \
 	cd / && \
 	git clone https://github.com/BWITS/fontforge.git && \
 	cd fontforge && \
