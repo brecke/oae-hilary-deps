@@ -22,7 +22,6 @@
 # $ docker run -it --name=hilary-deps --net=host oae-hilary-deps:latest
 #
 
-# FROM node:6.12.0-alpine
 FROM alpine:3.6
 LABEL Name=OAE-hilary-dependencies
 LABEL Author=ApereoFoundation 
@@ -100,7 +99,7 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 # Install pdf2htmlex based on
 # https://hub.docker.com/r/bwits/pdf2htmlex-alpine/
 #
-RUN apk --update add git alpine-sdk xz poppler-dev pango-dev m4 libtool perl autoconf automake coreutils python-dev zlib-dev freetype-dev glib-dev cmake libxml2 libxml2-dev libxml2-utils && \
+RUN apk --update add git ghostscript alpine-sdk xz poppler-dev pango-dev m4 libtool perl autoconf automake coreutils python-dev zlib-dev freetype-dev glib-dev cmake libxml2 libxml2-dev libxml2-utils && \
 	cd / && \
 	git clone https://github.com/BWITS/fontforge.git && \
 	cd fontforge && \
