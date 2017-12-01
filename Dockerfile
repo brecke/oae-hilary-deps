@@ -32,6 +32,7 @@ LABEL Email=oae@apereo.org
 # https://github.com/nodejs/docker-node/blob/bf84a38aeacb4f6aad34e07c79fd3a0084da5cd2/6/alpine/Dockerfile 
 #
 ENV NODE_VERSION 6.12.0
+ENV PHANTOMJS_VERSION 2.1.1
 
 RUN addgroup -g 1000 node \
 	&& adduser -u 1000 -G node -s /bin/sh -D node \
@@ -119,6 +120,9 @@ RUN apk --update add git ghostscript alpine-sdk xz poppler-dev pango-dev m4 libt
 	rm -rf /fontforge /libspiro /libuninameslist /pdf2htmlEX
 
 RUN apk add --no-cache \
+  curl \
+  tar \
+  bzip2 \
   chrpath \ 
   poppler \
   poppler-utils \
@@ -142,3 +146,90 @@ RUN adduser -h ${SERVICE_HOME} -s /sbin/nologin -u 1001 -D ${SERVICE_USER} && \
 	libreoffice \
 	libreoffice-base \
 	ttf-freefont
+
+#
+# Install phantomjs according to https://github.com/Overbryd/docker-phantomjs-alpine/blob/master/Dockerfile
+#
+COPY *.patch /
+RUN apk add --no-cache --virtual .build-deps \
+		bison \
+		flex \
+		fontconfig-dev \
+		freetype-dev \
+		g++ \
+		gcc \
+		git \
+		gperf \
+		icu-dev \
+		libc-dev \
+		libjpeg-turbo-dev \
+		libpng-dev \
+		libx11-dev \
+		libxext-dev \
+		linux-headers \
+		make \
+		openssl-dev \
+		paxctl \
+		perl \
+		python \
+		ruby \
+		sqlite-dev \
+	&& mkdir -p /usr/src \
+	&& cd /usr/src \
+	&& git clone git://github.com/ariya/phantomjs.git \
+	&& cd phantomjs \
+	&& git checkout $PHANTOMJS_VERSION \
+	&& git submodule init \
+	&& git submodule update \
+	&& for i in qtbase qtwebkit; do \
+		cd /usr/src/phantomjs/src/qt/$i \
+			&& patch -p1 -i /$i*.patch || break; \
+		done \
+	&& cd /usr/src/phantomjs \
+	&& patch -p1 -i /build.patch
+
+# build phantomjs
+RUN cd /usr/src/phantomjs \
+  && python build.py --confirm \
+	&& paxctl -cm bin/phantomjs \
+	&& strip --strip-all bin/phantomjs \
+	&& install -m755 bin/phantomjs /usr/bin/phantomjs \
+	&& runDeps="$( \
+		scanelf --needed --nobanner /usr/bin/phantomjs \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
+	)" \
+	&& apk add --virtual .phantomjs-rundeps $runDeps \
+	&& apk del .build-deps \
+	&& rm -r /*.patch /usr/src
+
+RUN apk add patchelf --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing --allow-untrusted
+
+# package binary build
+RUN cd /root \
+  && mkdir -p phantomjs/lib \
+  && cp /usr/bin/phantomjs phantomjs/ \
+  && cd phantomjs \
+    && for lib in `ldd phantomjs \
+      | awk '{if(substr($3,0,1)=="/") print $1,$3}' \
+      | cut -d' ' -f2`; do \
+        cp $lib lib/`basename $lib`; \
+      done \
+    && patchelf --set-rpath '$ORIGIN/lib' phantomjs \
+  && cd /root \
+  && tar cvf phantomjs.tar phantomjs \
+&& bzip2 -9 phantomjs.tar
+
+# RUN mkdir /tmp/phantomjs \
+  # && curl -L https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 \
+  # | tar -xj --strip-components=1 -C /tmp/phantomjs \
+  # && mv /tmp/phantomjs/bin/phantomjs /usr/local/bin
+
+# RUN npm install --global phantomjs-prebuilt
+# RUN npm install --global phantomjs
+RUN npm install --global nodemon
+RUN npm install --global bunyan
+RUN npm install --global grunt
+
