@@ -90,7 +90,7 @@ RUN set -ex \
 	done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.12.0
+ENV NODE_VERSION 8.9.4
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
 	&& curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -100,7 +100,7 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 	&& rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
 	&& ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
-ENV YARN_VERSION 0.21.3
+ENV YARN_VERSION 1.3.2
 
 RUN set -ex \
 	&& for key in \
