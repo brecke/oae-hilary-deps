@@ -24,7 +24,7 @@
 
 FROM ubuntu:16.04
 LABEL Name=OAE-hilary-dependencies
-LABEL Author=ApereoFoundation 
+LABEL Author=ApereoFoundation
 LABEL Email=oae@apereo.org
 
 # Install node (taken from the official node Dockerfile)
@@ -66,6 +66,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	make \
 	openssh-client \
 	patch \
+  software-properties-common \
 	wget \
 	xz-utils \
 	zlib1g-dev
@@ -117,20 +118,21 @@ RUN set -ex \
 	&& chmod +x /usr/local/bin/yarn
 
 # Install libreoffice as described in xcgd/libreoffice
-RUN apt-get install -y --no-install-recommends \
+RUN add-apt-repository ppa:webupd8team/java
+RUN apt-get update && apt-get install -y --no-install-recommends \
 	libreoffice \
 	libreoffice-writer \
 	ure \
 	libreoffice-java-common \
 	libreoffice-core \
 	libreoffice-common \
-	openjdk-8-jre
-# openjdk-7-jre
+  default-jre
+  # oracle-java8-installer
 RUN apt-get -y -q remove libreoffice-gnome
 RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
 
 # Install pdf2htmlex
-RUN echo "deb http://ftp.de.debian.org/debian sid main" >> /etc/apt/sources.list 
+RUN echo "deb http://ftp.de.debian.org/debian sid main" >> /etc/apt/sources.list
 RUN apt-get update && apt-get install -y --allow-unauthenticated --no-install-recommends \
 	chrpath \ 
 	libpoppler-glib-dev \
