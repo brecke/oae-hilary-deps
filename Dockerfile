@@ -29,6 +29,7 @@ LABEL Email=oae@apereo.org
 
 # Install node (taken from the official node Dockerfile)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+  apt-utils \
 	autoconf \
 	automake \
 	bzip2 \
@@ -118,25 +119,27 @@ RUN set -ex \
 	&& chmod +x /usr/local/bin/yarn
 
 # Install libreoffice as described in xcgd/libreoffice
-RUN add-apt-repository ppa:webupd8team/java
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	libreoffice \
-	libreoffice-writer \
-	ure \
-	libreoffice-java-common \
-	libreoffice-core \
-	libreoffice-common \
+	chrpath \ 
+	poppler-utils \
+	python-poppler \ 
+	libpoppler-glib-dev \
+  libfontforge1 \
+  pdf.js-common \
   default-jre
-  # oracle-java8-installer
 RUN apt-get -y -q remove libreoffice-gnome
 RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
 
 # Install pdf2htmlex
-RUN echo "deb http://ftp.de.debian.org/debian sid main" >> /etc/apt/sources.list
-RUN apt-get update && apt-get install -y --allow-unauthenticated --no-install-recommends \
-	chrpath \ 
-	libpoppler-glib-dev \
-	pdf2htmlex \
-	poppler-utils \
-	python-poppler \ 
-	&& rm -rf /var/lib/apt/lists/*
+RUN wget http://de.archive.ubuntu.com/ubuntu/pool/universe/p/pdf2htmlex/pdf2htmlex_0.14.6+ds-2build1_amd64.deb
+RUN dpkg -i pdf2htmlex_0.14.6+ds-2build1_amd64.deb
+
+# debug stuff just because
+RUN echo $(lsb_release -a)
+RUN echo $(soffice --version)
+RUN echo $(pdftotext -v)
+RUN echo $(pdf2htmlEX -v)
+RUN echo $(java -version)
+RUN echo $(node -v)
+RUN echo $(npm -v)
