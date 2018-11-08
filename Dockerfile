@@ -29,7 +29,7 @@ LABEL Email=oae@apereo.org
 
 # Install node (taken from the official node Dockerfile)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  apt-utils \
+	apt-utils \
 	autoconf \
 	automake \
 	bzip2 \
@@ -67,10 +67,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	make \
 	openssh-client \
 	patch \
-  software-properties-common \
+	software-properties-common \
 	wget \
 	xz-utils \
-	zlib1g-dev
+	zlib1g-dev \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --gid 1000 node \
 	&& useradd --uid 1000 --gid node --shell /bin/bash --create-home node
@@ -86,14 +88,14 @@ RUN set -ex \
 	B9AE9905FFD7803F25714661B63B535A4C206CA9 \
 	56730D5401028683275BD23C23EFEFE93C4CFFFE \
 	77984A986EBC2AA786BC0F66B01FBB92821C587A \
-  	; do \
+	; do \
 	gpg --keyserver pgp.mit.edu --recv-keys "$key" || \
 	gpg --keyserver keyserver.pgp.com --recv-keys "$key" || \
 	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" ; \
 	done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 8.9.4
+ENV NODE_VERSION 9.11.2
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
 	&& curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -125,21 +127,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	poppler-utils \
 	python-poppler \ 
 	libpoppler-glib-dev \
-  libfontforge1 \
-  pdf.js-common \
-  default-jre
+	libfontforge1 \
+	pdf.js-common \
+	default-jre \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
 RUN apt-get -y -q remove libreoffice-gnome
 RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
 
 # Install pdf2htmlex
-RUN wget http://de.archive.ubuntu.com/ubuntu/pool/universe/p/pdf2htmlex/pdf2htmlex_0.14.6+ds-2build1_amd64.deb
+RUN curl -fSL -o pdf2htmlex_0.14.6+ds-2build1_amd64.deb http://de.archive.ubuntu.com/ubuntu/pool/universe/p/pdf2htmlex/pdf2htmlex_0.14.6+ds-2build1_amd64.deb
 RUN dpkg -i pdf2htmlex_0.14.6+ds-2build1_amd64.deb
 
 # debug stuff just because
-RUN echo $(lsb_release -a)
-RUN echo $(soffice --version)
-RUN echo $(pdftotext -v)
-RUN echo $(pdf2htmlEX -v)
-RUN echo $(java -version)
-RUN echo $(node -v)
-RUN echo $(npm -v)
+RUN lsb_release -a
+RUN soffice --version
+RUN pdftotext -v
+RUN pdf2htmlEX -v
+RUN java -version
+RUN node -v
+RUN npm -v
