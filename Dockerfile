@@ -27,6 +27,8 @@ LABEL Name=OAE-hilary-dependencies
 LABEL Author=ApereoFoundation
 LABEL Email=oae@apereo.org
 
+ENV NODE_VERSION 10.13.0
+
 # Install node (taken from the official node Dockerfile)
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	apt-utils \
@@ -94,9 +96,6 @@ RUN set -ex \
 	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" ; \
 	done
 
-ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 9.11.2
-
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
 	&& curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
 	&& gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
@@ -104,21 +103,6 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 	&& tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \
 	&& rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
 	&& ln -s /usr/local/bin/node /usr/local/bin/nodejs
-
-ENV YARN_VERSION 1.3.2
-
-RUN set -ex \
-	&& for key in \
-	6A010C5166006599AA17F08146C2130DFD2497F5 \
-	; do \
-	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	done \
-	&& curl -fSL -o yarn.js "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-legacy-$YARN_VERSION.js" \
-	&& curl -fSL -o yarn.js.asc "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-legacy-$YARN_VERSION.js.asc" \
-	&& gpg --batch --verify yarn.js.asc yarn.js \
-	&& rm yarn.js.asc \
-	&& mv yarn.js /usr/local/bin/yarn \
-	&& chmod +x /usr/local/bin/yarn
 
 # Install libreoffice as described in xcgd/libreoffice
 RUN apt-get update && apt-get install -y --no-install-recommends \
