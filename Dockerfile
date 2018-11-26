@@ -59,7 +59,9 @@ RUN apk --update --no-cache add \
 		libxml2 \
 		libltdl \
 		cairo \
-		pango
+		pango \
+    graphicsmagick \
+    ghostscript
 
 # Install poppler
 RUN echo "Installing poppler ..." \
