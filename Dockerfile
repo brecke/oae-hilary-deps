@@ -27,12 +27,22 @@ LABEL Name=OAE-hilary-dependencies
 LABEL Author=ApereoFoundation
 LABEL Email=oae@apereo.org
 
-ENV REFRESHED_AT 20181123
+ENV REFRESHED_/AT 20181123
+ENV HOME_PATH "/"
 ENV POPPLER_NAME "poppler-0.63.0"
 ENV POPPLER_SOURCE "https://ftp.osuosl.org/pub/blfs/conglomeration/poppler/$POPPLER_NAME.tar.xz"
 ENV FONTFORGE_SOURCE "https://github.com/fontforge/fontforge.git"
 ENV PDF2HTMLEX_SOURCE "https://github.com/Rockstar04/pdf2htmlEX.git"
-ENV HOME_PATH "/"
+ENV PHANTOMJS_NAME "phantomjs-alpine-x86_64.tar.bz2"
+ENV PHANTOMJS_VERSION "2.11"
+ENV PHANTOMJS_SOURCE "https://github.com/Overbryd/docker-phantomjs-alpine/releases/download/$PHANTOMJS_VERSION/$PHANTOMJS_NAME"
+
+# Install phantomjs
+RUN apk --no-cache add fontconfig curl tar bzip2 \
+    && mkdir -p /usr/share \
+    && curl -L "$PHANTOMJS_SOURCE" | tar xj --directory /usr/share \
+    && chmod +x /usr/share/phantomjs/phantomjs \
+    && ln -s /usr/share/phantomjs/phantomjs /usr/bin/phantomjs
 
 # Dependencies for pdf2htmlEX and poppler
 RUN apk --update --no-cache add \
@@ -119,6 +129,7 @@ RUN apk add --no-cache libreoffice
 # Debug just because
 RUN pdf2htmlEX -v
 RUN pdftotext -v
+RUN phantomjs -v
 RUN soffice --version
 RUN node -v
 RUN npm -v
