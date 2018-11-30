@@ -33,16 +33,21 @@ ENV POPPLER_NAME "poppler-0.63.0"
 ENV POPPLER_SOURCE "https://ftp.osuosl.org/pub/blfs/conglomeration/poppler/$POPPLER_NAME.tar.xz"
 ENV FONTFORGE_SOURCE "https://github.com/fontforge/fontforge.git"
 ENV PDF2HTMLEX_SOURCE "https://github.com/Rockstar04/pdf2htmlEX.git"
-ENV PHANTOMJS_NAME "phantomjs-alpine-x86_64.tar.bz2"
-ENV PHANTOMJS_VERSION "2.11"
-ENV PHANTOMJS_SOURCE "https://github.com/Overbryd/docker-phantomjs-alpine/releases/download/$PHANTOMJS_VERSION/$PHANTOMJS_NAME"
 
-# Install phantomjs
-RUN apk --no-cache add fontconfig curl tar bzip2 \
-    && mkdir -p /usr/share \
-    && curl -L "$PHANTOMJS_SOURCE" | tar xj --directory /usr/share \
-    && chmod +x /usr/share/phantomjs/phantomjs \
-    && ln -s /usr/share/phantomjs/phantomjs /usr/bin/phantomjs
+
+# Installs latest Chromium (68) package.
+RUN apk update && apk upgrade && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
+    apk add --no-cache \
+      chromium@edge \
+      nss@edge
+
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
+# Puppeteer v1.4.0 works with Chromium 68.
+# RUN npm i puppeteer@1.4.0
 
 # Dependencies for pdf2htmlEX and poppler
 RUN apk --update --no-cache add \
@@ -70,8 +75,8 @@ RUN apk --update --no-cache add \
 		libltdl \
 		cairo \
 		pango \
-    graphicsmagick \
-    ghostscript
+    ghostscript \
+    graphicsmagick
 
 # Install poppler
 RUN echo "Installing poppler ..." \
@@ -124,12 +129,12 @@ RUN echo "Removing sources ..." \
 	  && cd "$HOME_PATH" && rm -rf "pdf2htmlEX"
 
 # Install libreoffice
-RUN apk add --no-cache libreoffice
+RUN apk add --no-cache libreoffice openjdk8-jre
 
 # Debug just because
 RUN pdf2htmlEX -v
 RUN pdftotext -v
-RUN phantomjs -v
+RUN gm version
 RUN soffice --version
 RUN node -v
 RUN npm -v
