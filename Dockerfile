@@ -26,71 +26,29 @@ FROM node:10-alpine
 LABEL Name=OAE-hilary-dependencies
 LABEL Author=ApereoFoundation
 LABEL Email=oae@apereo.org
+#
+# Installs latest Chromium (72) package.
+RUN apk update && apk upgrade && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
+    apk add --no-cache \
+      chromium@edge \
+      nss@edge \
+      freetype@edge \
+      harfbuzz@edge \
+      ttf-freefont@edge
 
-ENV REFRESHED_/AT 20181123
-ENV HOME_PATH "/"
-ENV FONTFORGE_SOURCE "https://github.com/fontforge/fontforge.git"
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Dependencies for pdf2htmlEX and poppler
 RUN apk --update --no-cache add \
-		alpine-sdk \
-		xz \
-		pango-dev \
-		m4 \
-		libtool \
-		perl \
-		autoconf \
-		automake \
-		coreutils \
-		python-dev \
-		zlib-dev \
-		freetype-dev \
-		glib-dev \
-		cmake \
-		libxml2-dev \
-		libpng \
-		libjpeg-turbo-dev \
-		python \
-		glib \
-		libintl \
-		libxml2 \
-		libltdl \
-		cairo \
-		pango \
     ghostscript \
     graphicsmagick
 
 # Dependencies for nodegit
 RUN apk --update --no-cache add build-base libgit2-dev
 RUN ln -s /usr/lib/libcurl.so.4 /usr/lib/libcurl-gnutls.so.4
-
-# Install fontforge libuninameslist
-RUN echo "Installing fontforge libuninameslist ..." \
-    && cd "$HOME_PATH" \
-		&& git clone https://github.com/fontforge/libuninameslist.git \
-    && cd libuninameslist \
-		&& autoreconf -i \
-		&& automake \
-		&& ./configure \
-		&& make \
-		&& make install
-
-# Install fontforge
-RUN echo "Installing fontforge ..." \
-    && cd "$HOME_PATH" \
-	 	&& git clone --depth 1 --single-branch --branch 20170731 "$FONTFORGE_SOURCE" \
-		&& cd fontforge/ \
-		&& git checkout tags/20170731 \
-		&& ./bootstrap \
-		&& ./configure \
-		&& make \
-		&& make install
-
-
-# Cleaning up
-RUN echo "Removing sources ..." \
-	  && cd "$HOME_PATH" && rm -rf "libuninameslist" \
-	  && cd "$HOME_PATH" && rm -rf "fontforge" 
 
 # Install libreoffice
 RUN apk add --no-cache libreoffice openjdk8-jre
