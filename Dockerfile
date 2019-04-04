@@ -43,6 +43,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Dependencies for pdf2htmlEX and poppler
 RUN apk --update --no-cache add \
+    git \
     ghostscript \
     graphicsmagick
 
