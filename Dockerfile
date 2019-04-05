@@ -26,7 +26,7 @@ FROM node:10-alpine
 LABEL Name=OAE-hilary-dependencies
 LABEL Author=ApereoFoundation
 LABEL Email=oae@apereo.org
-#
+
 # Installs latest Chromium (72) package.
 RUN apk update && apk upgrade && \
     echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
@@ -41,9 +41,25 @@ RUN apk update && apk upgrade && \
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
-# Dependencies for pdf2htmlEX and poppler
+# Other dependencies
 RUN apk --update --no-cache add \
+		alpine-sdk \
     git \
+		xz \
+		m4 \
+		libtool \
+		autoconf \
+		automake \
+		coreutils \
+		cmake \
+		libpng \
+		python \
+		glib \
+		libintl \
+		libxml2 \
+		libltdl \
+		cairo \
+		pango \
     ghostscript \
     graphicsmagick
 
